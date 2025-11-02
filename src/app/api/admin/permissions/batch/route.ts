@@ -268,8 +268,63 @@ export async function POST(request: NextRequest): Promise<NextResponse<BatchPerm
       )
     }
 
-    // In dry-run mode, return preview
+    // In dry-run mode, return comprehensive impact analysis
     if (dryRun) {
+      // Build detailed impact analysis for each user
+      const userImpacts: UserImpact[] = []
+      const riskCounts = { critical: 0, high: 0, medium: 0, low: 0 }
+
+      for (const targetUser of targetUsers) {
+        const newPermissions = updatedUserPermissions[targetUser.id]
+        const oldPermissions = roleChange
+          ? getRolePermissions(roleChange.from)
+          : getRolePermissions(targetUser.role)
+
+        const addedPerms = permissionChanges?.added || []
+        const removedPerms = permissionChanges?.removed || []
+
+        // Check for conflicts when removing permissions
+        const removalConflicts = analyzeRemovalConflicts(removedPerms, newPermissions)
+
+        // Calculate risk level
+        const riskLevel = calculateRiskLevel(roleChange, addedPerms, removedPerms)
+        riskCounts[riskLevel]++
+
+        userImpacts.push({
+          userId: targetUser.id,
+          email: targetUser.email,
+          currentRole: targetUser.role,
+          newRole: roleChange?.to,
+          permissionsAdded: addedPerms,
+          permissionsRemoved: removedPerms,
+          riskLevel,
+          conflicts: removalConflicts,
+        })
+      }
+
+      // Build warning messages
+      const warnings: Array<{ message: string }> = []
+
+      // Add validation errors as warnings
+      warnings.push(...validationErrors.map(e => ({ message: e.message })))
+
+      // Add risk warnings
+      if (riskCounts.critical > 0) {
+        warnings.push({
+          message: `${riskCounts.critical} user(s) will receive CRITICAL risk changes (e.g., admin role assignment)`,
+        })
+      }
+      if (riskCounts.high > 0) {
+        warnings.push({
+          message: `${riskCounts.high} user(s) will receive HIGH risk changes`,
+        })
+      }
+
+      // Add conflict warnings
+      const allConflicts = userImpacts
+        .flatMap(impact => impact.conflicts)
+        .filter((v, i, a) => a.indexOf(v) === i) // unique
+
       return NextResponse.json({
         success: true,
         preview: true,
@@ -277,7 +332,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<BatchPerm
           added: permissionChanges?.added?.length || 0,
           removed: permissionChanges?.removed?.length || 0,
         },
-        warnings: validationErrors.map(e => ({ message: e.message })),
+        warnings,
+        conflicts: allConflicts.map(msg => ({ message: msg })),
+        impactAnalysis: {
+          totalUsersAffected: targetUsers.length,
+          riskBreakdown: riskCounts,
+          userImpacts,
+          summary: `Affecting ${targetUsers.length} user(s): ${riskCounts.critical} critical, ${riskCounts.high} high, ${riskCounts.medium} medium, ${riskCounts.low} low risk changes`,
+        },
       })
     }
 
