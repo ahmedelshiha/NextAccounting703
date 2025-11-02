@@ -14,6 +14,8 @@ import {
 } from './components/tabs'
 import { CreateUserModal } from '@/components/admin/shared/CreateUserModal'
 import { useUsersContext } from './contexts/UsersContextProvider'
+import { ErrorBoundary } from '@/components/providers/error-boundary'
+import { TabSkeleton, DashboardTabSkeleton, MinimalTabSkeleton } from './components/TabSkeleton'
 import { toast } from 'sonner'
 
 /**
