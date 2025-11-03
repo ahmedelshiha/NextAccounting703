@@ -123,19 +123,20 @@ export const ClientFormModal = React.forwardRef<HTMLDivElement, ClientFormModalP
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="name" className="text-xs sm:text-sm">Name *</Label>
               <Input
                 id="name"
                 placeholder="Client name"
                 value={form.formData.name}
                 onChange={(e) => form.handleChange('name', e.target.value)}
                 disabled={form.isSubmitting}
+                className="text-sm"
               />
-              {form.fieldErrors.name && <p className="text-sm text-red-600">{form.fieldErrors.name}</p>}
+              {form.fieldErrors.name && <p className="text-xs sm:text-sm text-red-600">{form.fieldErrors.name}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
+              <Label htmlFor="email" className="text-xs sm:text-sm">Email *</Label>
               <Input
                 id="email"
                 type="email"
@@ -143,8 +144,9 @@ export const ClientFormModal = React.forwardRef<HTMLDivElement, ClientFormModalP
                 value={form.formData.email}
                 onChange={(e) => form.handleChange('email', e.target.value)}
                 disabled={form.isSubmitting}
+                className="text-sm"
               />
-              {form.fieldErrors.email && <p className="text-sm text-red-600">{form.fieldErrors.email}</p>}
+              {form.fieldErrors.email && <p className="text-xs sm:text-sm text-red-600">{form.fieldErrors.email}</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
