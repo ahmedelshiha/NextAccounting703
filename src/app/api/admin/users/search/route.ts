@@ -6,8 +6,10 @@ import { respond } from '@/lib/api-response'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { tenantFilter } from '@/lib/tenant'
 import { applyRateLimit, getClientIp } from '@/lib/rate-limit'
+import { createHash } from 'crypto'
 
 export const runtime = 'nodejs'
+export const revalidate = 30 // ISR: Revalidate every 30 seconds for search results
 
 export interface UserFilterOptions {
   search?: string
@@ -142,13 +144,19 @@ export const GET = withTenantContext(async (request: NextRequest) => {
           name: true,
           email: true,
           role: true,
+          status: true,
           availabilityStatus: true,
           department: true,
+          position: true,
           tier: true,
           experienceYears: true,
+          hourlyRate: true,
+          skills: true,
+          certifications: true,
+          image: true,
+          hireDate: true,
           createdAt: true,
-          updatedAt: true,
-          certifications: true
+          updatedAt: true
         },
         orderBy,
         skip,
@@ -161,7 +169,8 @@ export const GET = withTenantContext(async (request: NextRequest) => {
     const hasNextPage = filters.page < totalPages
     const hasPreviousPage = filters.page > 1
 
-    return NextResponse.json({
+    // Build response object
+    const responseData = {
       success: true,
       data: users,
       pagination: {
@@ -180,6 +189,28 @@ export const GET = withTenantContext(async (request: NextRequest) => {
         tier: filters.tier,
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder
+      }
+    }
+
+    // Generate ETag from response data for caching
+    const etagData = JSON.stringify(responseData)
+    const etag = `"${createHash('sha256').update(etagData).digest('hex')}"`
+
+    // Check If-None-Match header for conditional request
+    const ifNoneMatch = request.headers.get('if-none-match')
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      return new NextResponse(null, { status: 304, headers: { ETag: etag } })
+    }
+
+    // Return response with caching headers
+    return NextResponse.json(responseData, {
+      headers: {
+        ETag: etag,
+        'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+        'X-Total-Count': total.toString(),
+        'X-Total-Pages': totalPages.toString(),
+        'X-Current-Page': filters.page.toString(),
+        'X-Page-Size': filters.limit.toString()
       }
     })
   } catch (error) {

@@ -19,7 +19,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { useDashboardMetrics, useDashboardRecommendations, useDashboardAnalytics, useFilterUsers } from '../../hooks'
+import { useDashboardMetrics, useDashboardRecommendations, useDashboardAnalytics, useFilterUsers, useServerSideFiltering } from '../../hooks'
 import { UserItem } from '../../contexts/UsersContextProvider'
 import { toast } from 'sonner'
 
@@ -75,13 +75,39 @@ export function ExecutiveDashboardTab({
     onRefresh?.()
   }
 
-  // Filter users based on active filters
-  const filteredUsers = useFilterUsers(users, {
+  // Determine if we have active filters
+  const hasActiveFilters = Boolean(
+    filters.search ||
+    filters.role ||
+    filters.status ||
+    filters.department
+  )
+
+  // Use server-side filtering when filters are active (Phase 4.3 optimization)
+  const serverFiltering = useServerSideFiltering(
+    {
+      search: filters.search,
+      role: filters.role,
+      status: filters.status,
+      department: filters.department,
+      page: 1,
+      limit: 100,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    },
+    { enabled: hasActiveFilters, debounceMs: 300 }
+  )
+
+  // Use client-side filtering as fallback when no active filters (faster for initial load)
+  const clientFilteredUsers = useFilterUsers(users, {
     search: filters.search,
     role: filters.role,
     status: filters.status,
     department: filters.department
   })
+
+  // Choose the appropriate filtered users based on filter status
+  const filteredUsers = hasActiveFilters ? serverFiltering.data : clientFilteredUsers
 
   const displayMetrics: OperationsMetrics = stats || {
     totalUsers: users.length,

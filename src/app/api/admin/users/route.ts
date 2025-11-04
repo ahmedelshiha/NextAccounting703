@@ -9,6 +9,7 @@ import { applyRateLimit, getClientIp } from '@/lib/rate-limit'
 import { tenantFilter } from '@/lib/tenant'
 
 export const runtime = 'nodejs'
+export const revalidate = 30 // ISR: Revalidate every 30 seconds
 
 export const GET = withTenantContext(async (request: Request) => {
   const ctx = requireTenantContext()
@@ -49,6 +50,13 @@ export const GET = withTenantContext(async (request: Request) => {
             name: true,
             email: true,
             role: true,
+            status: true,
+            availabilityStatus: true,
+            department: true,
+            position: true,
+            tier: true,
+            experienceYears: true,
+            image: true,
             createdAt: true,
             updatedAt: true
           },
@@ -115,6 +123,7 @@ export const GET = withTenantContext(async (request: Request) => {
         return new NextResponse(null, { status: 304, headers: { ETag: etag } })
       }
 
+      const totalPages = Math.ceil(total / limit)
       return NextResponse.json(
         {
           users: mapped,
@@ -122,13 +131,17 @@ export const GET = withTenantContext(async (request: Request) => {
             page,
             limit,
             total,
-            pages: Math.ceil(total / limit)
+            pages: totalPages
           }
         },
         {
           headers: {
             ETag: etag,
-            'Cache-Control': 'private, max-age=30, stale-while-revalidate=60'
+            'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+            'X-Total-Count': total.toString(),
+            'X-Total-Pages': totalPages.toString(),
+            'X-Current-Page': page.toString(),
+            'X-Page-Size': limit.toString()
           }
         }
       )
