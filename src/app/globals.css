@@ -119,6 +119,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Phase 4: Accessibility - Clear focus indicators */
+  :where(button,[role="button"],a, input, select, textarea):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
 /* Animation keyframes */
@@ -209,6 +214,14 @@
   .animate-icon-translate,
   .animate-sheet-enter {
     animation: none;
+  }
+}
+
+/* Phase 4: Accessibility - Ensure comfortable touch targets on coarse pointers */
+@media (pointer: coarse) {
+  :where(button,[role="button"],a[role="button"], .icon-button) {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

@@ -136,8 +136,8 @@ export const RecommendedActionsPanel = memo(function RecommendedActionsPanel({
 
       <div className="recommendations-list" role="region" aria-label="Recommended actions">
         {visibleRecommendations.map(rec => {
-          const ImpactIcon = ICON_MAP[rec.impactLevel] || Info
-          const impactClass = `impact-${rec.impactLevel.toLowerCase()}`
+          const ImpactIcon = ICON_MAP[rec.impact] || Info
+          const impactClass = `impact-${rec.impact.toLowerCase()}`
 
           return (
             <div
@@ -162,28 +162,27 @@ export const RecommendedActionsPanel = memo(function RecommendedActionsPanel({
 
               <p className="recommendation-description">{rec.description}</p>
 
-              {rec.action && (
+              {rec.actions?.[0] && (
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => handleAction(rec.id)}
                   className="recommendation-action-btn"
                 >
-                  {rec.action.label}
+                  {rec.actions[0].label}
                 </Button>
               )}
 
-              {rec.metrics && (
+              {(rec.estimatedBenefit || rec.estimatedSavings) && (
                 <div className="recommendation-metrics">
-                  {rec.metrics.impactScore && (
-                    <span className="metric">
-                      Impact: {(rec.metrics.impactScore * 100).toFixed(0)}%
-                    </span>
+                  {rec.estimatedBenefit && (
+                    <span className="metric">Benefit: {rec.estimatedBenefit}</span>
                   )}
-                  {rec.metrics.affectedUsers && (
-                    <span className="metric">
-                      Affects {rec.metrics.affectedUsers} users
-                    </span>
+                  {rec.estimatedSavings?.time && (
+                    <span className="metric">Saves {rec.estimatedSavings.time}</span>
+                  )}
+                  {rec.estimatedSavings?.cost && (
+                    <span className="metric">Saves {rec.estimatedSavings.cost}</span>
                   )}
                 </div>
               )}

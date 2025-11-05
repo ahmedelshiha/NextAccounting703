@@ -35,7 +35,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
  * @returns Analytics data, loading state, error, and refresh function
  */
 export function useRealtimeAnalytics(filters?: UserFilters) {
-  const debounceTimer = useRef<NodeJS.Timeout>()
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   /**
    * Build query string from filters for cache key
