@@ -2051,6 +2051,123 @@ Create these files in `/docs`:
 
 ---
 
+## 📖 Phase 6 Documentation Reference
+
+**Complete Phase 6 documentation has been created and is ready for use.**
+
+### Quick Links
+
+| Document | Purpose | Size |
+|----------|---------|------|
+| **[PHASE_6_BUILDER_IO_CMS_INTEGRATION.md](./PHASE_6_BUILDER_IO_CMS_INTEGRATION.md)** | Complete implementation guide with setup, model definitions, usage scenarios, troubleshooting | 475 lines |
+| **[BUILDER_IO_ENV_SETUP.md](./BUILDER_IO_ENV_SETUP.md)** | Quick 30-minute environment setup guide for developers | 96 lines |
+| **[PHASE_6_COMPLETION_SUMMARY.md](./PHASE_6_COMPLETION_SUMMARY.md)** | Detailed completion report with deliverables, QA checklist, next steps | 345 lines |
+| **[PHASE_6_QUICK_REFERENCE.md](./PHASE_6_QUICK_REFERENCE.md)** | One-page reference card for developers and admins | 286 lines |
+
+### What Each Document Covers
+
+#### 🔧 PHASE_6_BUILDER_IO_CMS_INTEGRATION.md (Main Reference)
+- Overview of Builder.io integration purpose
+- Complete code implementations (config, hooks, slots, API, tests)
+- Manual setup instructions (one-time, 30 minutes)
+- How admins use the CMS (3 scenarios)
+- Technical architecture and data flow
+- Testing procedures (manual + automated)
+- Troubleshooting guide
+- Environment variables reference
+- Next steps (Phase 7-8)
+
+**When to use:** Full understanding, setup instructions, troubleshooting
+
+#### ⚡ BUILDER_IO_ENV_SETUP.md (Quick Setup)
+- 2-minute quick start
+- Required/optional environment variables
+- Verification checklist
+- Troubleshooting table
+- Connection testing script
+
+**When to use:** Initial environment setup
+
+#### ✅ PHASE_6_COMPLETION_SUMMARY.md (Implementation Report)
+- Deliverables checklist (7 files, 12 tests)
+- Code quality & testing coverage
+- Security best practices applied
+- Files changed/created
+- Quality assurance summary
+- Next steps for Phase 7-8
+
+**When to use:** Understanding what was built, QA review, project management
+
+#### 📋 PHASE_6_QUICK_REFERENCE.md (Developer Cheat Sheet)
+- One-page status summary
+- 30-minute setup checklist
+- File structure quick reference
+- 5 editable slots overview
+- Environment variables summary
+- Common tasks (hide card, add button, test layouts)
+- Troubleshooting table
+- Success criteria
+- Status indicators
+
+**When to use:** Quick lookup during development, status checks
+
+### What Was Implemented
+
+✅ **Code Files (7 total):**
+1. `src/lib/builder-io/config.ts` — Enhanced with 5 models + schemas
+2. `src/hooks/useBuilderContent.ts` — Advanced hook with caching
+3. `src/hooks/useIsBuilderEnabled.ts` — New simple enable check
+4. `src/app/admin/users/components/workbench/BuilderSlots.tsx` — Enhanced with 5 slots
+5. `src/app/api/builder-io/content/route.ts` — API endpoint (existing)
+6. `src/app/admin/users/components/workbench/__tests__/BuilderIntegration.test.tsx` — 12 tests
+7. (Documentation) Various guides
+
+✅ **Documentation Files (4 new):**
+1. `docs/PHASE_6_BUILDER_IO_CMS_INTEGRATION.md` — 475 lines
+2. `docs/BUILDER_IO_ENV_SETUP.md` — 96 lines
+3. `docs/PHASE_6_COMPLETION_SUMMARY.md` — 345 lines
+4. `docs/PHASE_6_QUICK_REFERENCE.md` — 286 lines
+
+### How to Use This Documentation
+
+**For First-Time Setup:**
+1. Read: `BUILDER_IO_ENV_SETUP.md` (5 min)
+2. Follow: Quick 30-minute setup checklist
+3. Reference: `PHASE_6_BUILDER_IO_CMS_INTEGRATION.md` for model definitions
+
+**For Daily Development:**
+1. Keep: `PHASE_6_QUICK_REFERENCE.md` open
+2. Refer: Common tasks section for quick answers
+
+**For Troubleshooting:**
+1. Check: Troubleshooting sections in `PHASE_6_QUICK_REFERENCE.md` or main guide
+2. Read: Full troubleshooting guide in `PHASE_6_BUILDER_IO_CMS_INTEGRATION.md`
+
+**For Project Management:**
+1. Review: `PHASE_6_COMPLETION_SUMMARY.md` for deliverables
+2. Check: Status indicators for phase progress
+
+### Key Features Documented
+
+📌 **What Admins Can Do** (after setup):
+- Hide/show KPI cards without code
+- Reorder metrics cards via drag-drop
+- Customize button labels instantly
+- Add custom action buttons
+- Change filter visibility
+- Test different layouts (A/B testing)
+- Instant rollback of changes
+
+🔧 **What Developers Get**:
+- Graceful fallback if CMS unavailable
+- Intelligent caching (5-minute default)
+- Automatic retry on failures
+- Type-safe configuration
+- 12 integration tests
+- Complete API documentation
+
+---
+
 ## 🎓 Summary
 
 This roadmap provides everything your team needs to:
