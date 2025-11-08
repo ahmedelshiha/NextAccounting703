@@ -91,7 +91,7 @@ const UserGrowthChart = memo(function UserGrowthChart({
           usePointStyle: true,
           font: {
             size: 12,
-            weight: '500'
+            weight: 500 as any
           },
           color: '#374151'
         }
@@ -117,7 +117,7 @@ const UserGrowthChart = memo(function UserGrowthChart({
         beginAtZero: true,
         grid: {
           color: 'rgba(0, 0, 0, 0.05)',
-          drawBorder: false
+          display: true
         },
         ticks: {
           color: '#6b7280',
@@ -126,8 +126,7 @@ const UserGrowthChart = memo(function UserGrowthChart({
       },
       x: {
         grid: {
-          display: false,
-          drawBorder: false
+          display: false
         },
         ticks: {
           color: '#6b7280',

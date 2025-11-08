@@ -27,11 +27,13 @@ export default function UserDirectorySection({
 }: UserDirectorySectionProps) {
   return (
     <Suspense fallback={<UserDirectorySkeleton />}>
-      <UsersTableWrapper
-        selectedUserIds={selectedUserIds}
-        onSelectionChange={onSelectionChange}
-        filters={filters}
-      />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <UsersTableWrapper
+          selectedUserIds={selectedUserIds}
+          onSelectionChange={onSelectionChange}
+          filters={filters}
+        />
+      </div>
     </Suspense>
   )
 }

@@ -101,14 +101,14 @@ export function useUsers(params: UseUsersParams = {}): UseUsersResult {
     await fetchUsers(false)
   }, [fetchUsers])
 
+  const hasMore = useMemo(() => {
+    return users.length > 0 && offset + (params.limit || 50) < total
+  }, [users.length, offset, params.limit, total])
+
   const loadMore = useCallback(async () => {
     if (!hasMore) return
     await fetchUsers(true)
   }, [hasMore, fetchUsers])
-
-  const hasMore = useMemo(() => {
-    return users.length > 0 && offset + (params.limit || 50) < total
-  }, [users.length, offset, params.limit, total])
 
   return {
     users,
