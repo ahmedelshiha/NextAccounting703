@@ -146,7 +146,7 @@ This document provides:
 │  │ Editor       │               │  └────────────────────────┘  │
 │  │ Viewer       │               │                              │
 │  └──────────────┘               │  User Directory              │
-│                                  │  ┌────────────────────────┐  │
+│                                  │  ┌─���──────────────────────┐  │
 │  User Growth                      │  │ Name│Email│Role│Status│  │
 │  ┌──────────────┐               │  │ Jane│jane@│Adm│Active│  │
 │  │ [Line Chart] │               │  │ John│john@│Edit│Inact│  │
@@ -489,7 +489,7 @@ This document provides:
 │                                                         │
 │  Charts coming soon...                                  │
 │                                                         │
-├���───���────────────────────────────────────────────────────┤
+├────���────────────────────────────────────────────────────┤
 │ [Total Users: 6] [Pending: 0] [In Progress: 6] [Due: 0] │ ← 4 cards, dark bg
 ├──────────────────────────────────────────────────��──────┤
 │ User Directory (minimal rows shown)                      │
@@ -514,7 +514,7 @@ This document provides:
 │ ────────────────────│ │ Cost/User: $45 (-2%)               │  │
 │ [Line Chart]         │ └─────────────────────────────────────┘  │
 │                      │                                           │
-│ Filters              �� User Directory                            │
+│ Filters              │ User Directory                            │
 │ ────────────────────│ ┌─────────────────────────────────────┐  │
 │ Role: All ▼          │ │ Name  │ Email  │ Role  │ Status│...│  │
 │ Status: All ▼        │ │ Jane  │ jane@  │ Admin │Active │...│  │
@@ -602,7 +602,7 @@ This document provides:
 
 | Property | Current | Target | Variance | Fix |
 |----------|---------|--------|----------|-----|
-| **Position** | Inline below filters | Fixed left column (320px width) | ��� Layout change | Add left panel CSS |
+| **Position** | Inline below filters | Fixed left column (320px width) | ❌ Layout change | Add left panel CSS |
 | **Width** | Full width | 320px (fixed) | ❌ Size change | Set `w-80` |
 | **Visibility** | Always visible | Hidden <1024px, toggle drawer | ❌ Responsive change | Add responsive classes |
 | **Background** | Dark gray | White | ❌ Color mismatch | Change `bg-white` |
@@ -1868,7 +1868,7 @@ bg-gray-900/50 → bg-gray-100/50
 
 /* Text Colors */
 text-gray-100 → text-gray-900
-text-gray-200 → text-gray-600
+text-gray-200 ��� text-gray-600
 text-gray-300 → text-gray-700
 text-gray-400 → text-gray-500
 text-white → text-gray-900
@@ -1944,12 +1944,24 @@ This section documents the User Directory table features analyzed from the targe
      - Formatted as "Mon DD, YYYY" (e.g., "Jan 19, 2024")
 
 2. **Verify Avatar Display**
-   - [ ] Avatar displays in Name column
-   - [ ] Avatar size: 32px (w-8 h-8)
-   - [ ] Placeholder image for missing avatars
-   - [ ] Lazy loading enabled for performance
-   - [ ] Proper alt text for accessibility
+   - [x] Avatar displays in Name column
+   - [x] Avatar size: 32px (w-8 h-8)
+   - [x] Placeholder image for missing avatars
+   - [x] Lazy loading enabled for performance
+   - [x] Proper alt text for accessibility
    - **File:** `src/app/admin/users/components/UserRow.tsx`
+   - **Status:** ✅ COMPLETED
+   - **Implementation Details:**
+     - Avatar element: `<img src={user.avatar || fallback} />`
+     - Size: w-8 h-8 = 32px × 32px (matches target design)
+     - Border radius: rounded-full (circular avatar)
+     - Fallback: Uses https://via.placeholder.com/32 placeholder image
+     - Background: bg-gray-200 (gray fallback while loading)
+     - Object fit: object-cover (crops image to fill container)
+     - Lazy loading: enabled with loading="lazy" attribute
+     - Alt text: `alt={user.name || 'User avatar'}` for accessibility
+     - Positioned in Name column (2fr width)
+     - Spacing: gap-3 between avatar and user info
 
 3. **Verify Row Hover Effects**
    - [ ] Hover background: light gray (#f9fafb)
