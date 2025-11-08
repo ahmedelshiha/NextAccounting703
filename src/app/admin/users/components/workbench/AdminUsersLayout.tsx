@@ -85,11 +85,6 @@ export default function AdminUsersLayout() {
 
           {/* User Directory Section */}
           <div className="admin-workbench-directory">
-            <DirectoryHeader
-              selectedCount={selectedCount}
-              onClearSelection={handleClearSelection}
-              onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
-            />
             <UserDirectorySection
               selectedUserIds={selectedUserIds}
               onSelectionChange={setSelectedUserIds}
