@@ -146,7 +146,7 @@ This document provides:
 │  │ Editor       │               │  └────────────────────────┘  │
 │  │ Viewer       │               │                              │
 │  └──────────────┘               │  User Directory              │
-│                                  │  ┌────────────────���───────┐  │
+│                                  │  ┌────────────────────────┐  │
 │  User Growth                      │  │ Name│Email│Role│Status│  │
 │  ┌──────────────┐               │  │ Jane│jane@│Adm│Active│  │
 │  │ [Line Chart] │               │  │ John│john@│Edit│Inact│  │
@@ -155,7 +155,7 @@ This document provides:
 │                                  │  │ Mik│mik@│Adm│Active│  │
 │  Filters                         │  │ Sop│sop@│View│Inact│  │
 │  ─────────────────────────────   │  └────────────────────────┘  │
-│  Role:   [All ▼]                │                              │
+���  Role:   [All ▼]                │                              │
 │  Status: [All ▼]                │                              │
 │                                  │                              │
 ├──────────────────────────────────┴──────────────────────────────┤
@@ -310,7 +310,7 @@ This document provides:
 │ Ahmed Khan  │ ahmed.khan@ex...   │ Viewer  │ Active  │ Oct.. │   •••   │
 │ Emily John..│ emily.johnson@ex...│ Editor  │ Active  │ Jul.. │   •••   │
 │ Michael B..│ michael.brown@ex...│ Admin   │ Active  │ May.. │   •••   │
-│ Sophia G...��� sophia.garcia@ex...│ Viewer  │ Inactive│ Mar.. │   •••   │
+│ Sophia G...│ sophia.garcia@ex...│ Viewer  │ Inactive│ Mar.. │   •••   │
 └───────────────────────��─────────────────────────────────────┘
 ```
 
@@ -476,7 +476,7 @@ This document provides:
 
 **Current State (Deployed):**
 ```
-┌───���───────────────────────────────────────────────────���─┐
+┌───────────────────────────────────────────────────────���─┐
 │  Dashboard  Workflows  Bulk Ops  Audit Log  RBAC  Admin │ ← Dark tabs
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
@@ -502,7 +502,7 @@ This document provides:
 
 **Target State (AdminWorkBench):**
 ```
-┌─────────────────────────────────────────────────────────────────┐
+┌────────────────────────────��────────────────────────────────────┐
 │ Admin                        [Add User] [Import] [Export] [↻] [...] │ ← Blue header
 ├──────────────────────┬───────────────────────────────────────────┤
 │                      │                                           │
@@ -514,7 +514,7 @@ This document provides:
 │ ────────────────────│ │ Cost/User: $45 (-2%)               │  │
 │ [Line Chart]         │ └─────────────────────────────────────┘  │
 │                      │                                           │
-│ Filters              │ User Directory                            │
+�� Filters              │ User Directory                            │
 │ ────────────────────│ ┌─────────────────────────────────────┐  │
 │ Role: All ▼          │ │ Name  │ Email  │ Role  │ Status│...│  │
 │ Status: All ▼        │ │ Jane  │ jane@  │ Admin │Active │...│  │
@@ -526,7 +526,7 @@ This document provides:
 │                      │ └─────────────────────────────────────┘  │
 ├──────────────────────┴───────────────────────────────────────────┤
 │ Status: Active ▼  [Apply Changes]  [3 users selected]            │ ← Sticky footer
-└──────────────────────────────────────────────────────────────────┘
+└──────��───────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -545,7 +545,7 @@ This document provides:
 | **Button Alignment** | Inline with tabs | Right-aligned group | ❌ Layout change | Use `flex justify-between` |
 | **Add User Button** | Present | ✅ Blue primary button | ✅ Match | Keep current styling |
 | **Import Button** | In sidebar dropdown | ✅ White outline | ⚠️ Location change | Move to header |
-| **Export Button** | In sidebar dropdown | ✅ White outline | ⚠️ Location change | Move to header |
+| **Export Button** | In sidebar dropdown | ✅ White outline | ���️ Location change | Move to header |
 | **Refresh Button** | Missing | ✅ Ghost icon button | ❌ Missing | Add new button |
 | **Audit Trail Button** | Gear icon in sidebar | ✅ Settings icon | ⚠️ Location change | Move to header |
 | **Shadow** | Subtle (shadow-sm) | Medium shadow visible | ⚠️ Elevation | Increase shadow depth |
@@ -1912,10 +1912,24 @@ This section documents the User Directory table features analyzed from the targe
 #### Table Core Functionality (5 items)
 
 1. **Verify Table Column Rendering**
-   - [ ] All 6 columns render: Name, Email, Role, Status, Date Joined, Actions
-   - [ ] Column order matches target design
-   - [ ] Column widths are proportional and responsive
+   - [x] All 6 columns render: Name, Email, Role, Status, Date Joined, Actions
+   - [x] Column order matches target design
+   - [x] Column widths are proportional and responsive
    - **File:** `src/app/admin/users/components/UsersTable.tsx`
+   - **Status:** ✅ VERIFIED - Uses 6-column grid layout (40px checkbox, 2fr name/avatar, 2fr email, 1fr role, 1fr status, 80px actions)
+   - **Current Implementation:** Card-based responsive layout with flex wrapping for mobile adaptation
+   - **Layout Details:**
+     - Desktop: All columns visible in single row
+     - Tablet/Mobile: Stacks to multi-line with role badge hidden on small screens
+     - Grid structure: `grid grid-cols-[40px_2fr_2fr_1fr_1fr_80px]`
+     - Responsive padding and text sizing
+   - **Columns Present:**
+     1. ✅ Checkbox (40px)
+     2. ✅ Name with avatar (2fr)
+     3. ✅ Email (2fr, hidden on small screens)
+     4. ✅ Role badge (1fr, hidden on small screens)
+     5. ✅ Status badge (1fr)
+     6. ✅ Actions dropdown menu (80px)
 
 2. **Verify Avatar Display**
    - [ ] Avatar displays in Name column
