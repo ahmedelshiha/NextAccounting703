@@ -37,22 +37,22 @@ function MetricCard({
 }: MetricCardProps) {
   return (
     <Card className="bg-white border-gray-200 border-1">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-3 px-4">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 pt-2 px-3">
         <CardTitle className="text-xs font-medium text-gray-600">{title}</CardTitle>
-        <span className="text-lg">{icon}</span>
+        <span className="text-base">{icon}</span>
       </CardHeader>
-      <CardContent className="px-4 pb-3">
+      <CardContent className="px-3 pb-2">
         {isLoading ? (
           <div className="space-y-1">
-            <div className="h-6 bg-gray-100 rounded w-12 animate-pulse" />
-            <div className="h-3 bg-gray-100 rounded w-16 animate-pulse" />
+            <div className="h-5 bg-gray-100 rounded w-12 animate-pulse" />
+            <div className="h-2.5 bg-gray-100 rounded w-14 animate-pulse" />
           </div>
         ) : (
           <>
-            <div className="text-2xl font-bold text-gray-900">{value}</div>
+            <div className="text-xl font-bold text-gray-900">{value}</div>
             {trend !== undefined && (
               <div
-                className={`text-xs font-medium mt-1 ${
+                className={`text-xs font-medium mt-0.5 ${
                   trend > 0 ? 'text-green-600' : trend < 0 ? 'text-red-600' : 'text-gray-600'
                 }`}
               >
