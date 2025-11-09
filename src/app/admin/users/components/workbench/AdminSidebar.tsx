@@ -2,7 +2,8 @@
 
 import React, { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { X, Search } from 'lucide-react'
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -99,7 +100,22 @@ export default function AdminSidebar({
             </svg>
           </CollapsibleTrigger>
 
-          <CollapsibleContent className="admin-sidebar-content-inner">
+	          <CollapsibleContent className="admin-sidebar-content-inner">
+	            {/* Search filter */}
+	            <div className="admin-sidebar-filter-group">
+	              <label className="admin-sidebar-filter-label">Search</label>
+	              <div className="relative">
+	                <Input
+	                  type="text"
+	                  placeholder="Search users..."
+	                  value={filters.search}
+	                  onChange={(e) => handleFilterChange('search', e.target.value)}
+	                  className="pl-8 admin-sidebar-filter-select"
+	                  aria-label="Search users"
+	                />
+	                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+	              </div>
+	            </div>
             {/* Role filter */}
             <div className="admin-sidebar-filter-group">
               <label className="admin-sidebar-filter-label">Role</label>
