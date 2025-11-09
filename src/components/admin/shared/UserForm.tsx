@@ -74,7 +74,7 @@ export const UserForm = React.forwardRef<HTMLFormElement, UserFormProps>(
     } = useForm({
       resolver: zodResolver(schema),
       defaultValues: initialData || {
-        role: 'USER',
+        role: 'CLIENT',
         isActive: true,
         requiresOnboarding: mode === 'create',
       },
