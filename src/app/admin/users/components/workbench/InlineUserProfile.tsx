@@ -164,6 +164,7 @@ export default function InlineUserProfile({ onBack }: { onBack: () => void }) {
             <div className="max-w-5xl mx-auto px-6 md:px-8 py-8">
               {activeTab === 'overview' && <OverviewTab user={selectedUser} />}
               {activeTab === 'details' && <DetailsTab user={selectedUser} isEditing={editMode} />}
+              {activeTab === 'permissions' && <PermissionsTab user={selectedUser} />}
               {activeTab === 'activity' && <ActivityTab userId={selectedUser.id} />}
               {activeTab === 'settings' && <SettingsTab user={selectedUser} />}
             </div>
