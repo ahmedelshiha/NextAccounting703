@@ -137,7 +137,7 @@ Each phase includes objectives, key tasks, acceptance criteria, and dependencies
   - End-to-end setup succeeds for happy-path in UAE/KSA/EGY; duplicate protection; consent captured with timestamp/IP/UA; audit events present.
   - Accessibility verified (tab order, labels, contrast); localized AR/EN content; RTL layout correct.
 - Telemetry
-  - Funnel metrics: view → submit ��� verified → completed; reason codes for drop-offs; time-to-completion; registry latency.
+  - Funnel metrics: view → submit → verified → completed; reason codes for drop-offs; time-to-completion; registry latency.
 - Testing
   - Unit tests for validators; contract tests for adapters; E2E flows: existing vs new entity, duplicate, offline registry, manual review route.
 
@@ -217,6 +217,34 @@ Mobile and Desktop dashboards deliver identical functions with layout-specific a
 - Accessibility & performance
   - ARIA landmarks/labels; focus-visible outlines; 60fps scroll; image/icon lazy loading; localization AR/EN;
   - Breakpoints: mobile <640px, tablet 641–1024px, desktop ≥1024px with 3-column layout.
+
+### Phase 2.1 — Upcoming Compliances (List & Detail)
+- Observed UI (from image)
+  - Screen title: “Upcoming Compliances”. Month chips (e.g., December 2025, November 2025).
+  - Cards grouped by month; left circular day badge (e.g., 31, 28); title and description: ESR Report, UBO Register Submission/Update, VAT Return & Payment (Monthly) with guidance lines.
+- Domain mapping
+  - UAE examples: ESR annual within 12 months of FY-end (if relevant activity), UBO update within 15 days of changes + annual confirm by 31 Dec, VAT return+payment due 28 days after month-end.
+  - KSA/Egypt equivalents populated from country registry (Zakat/WHT, ETA VAT, etc.).
+- Data model & computation
+  - obligations(id, entity_id, type, country, frequency, rule_config, active)
+  - filing_periods(id, obligation_id, period_start, period_end, due_at, status[upcoming|overdue|filed|waived], computed_fields)
+  - rules engine computes due_at per country: e.g., VAT monthly → end_of_month(period)+28d (UAE), ESR → fy_end+12m, UBO → change_date+15d with annual 31-Dec reminder.
+- API
+  - GET /api/compliance/upcoming?entity_id=… → groups by month, returns cards with id, title, desc, due_day, due_at, priority, country.
+  - PATCH /api/filing-periods/:id {status, assignee_id, snooze_until}.
+  - POST /api/ics/:id to export ICS; deep link to detail.
+- UX (mobile)
+  - Sticky month chips; infinite scroll by date; tap card → detail page with checklist, docs, and actions (Assign, Add evidence, Mark as submitted, Record payment reference, Export ICS, Open messaging thread).
+  - Empty state when no items in next 90 days; filter by obligation type; search.
+- UX (desktop)
+  - Two-pane: left filters (type, country, status, period), center list, right detail panel with activity and attachments.
+  - Bulk select to assign/snooze/mark submitted; keyboard shortcuts (A assign, S snooze, M mark submitted).
+- Notifications & reminders
+  - Reminder schedule: T-14, T-7, T-3, T-1 days; escalate if unacknowledged; WhatsApp/SMS/email opt-in.
+- Telemetry
+  - compliance.view, month_chip.click, card.open, action.assign/snooze/mark, ics.export; dimensions: country, obligation_type.
+- Acceptance criteria
+  - Correct due dates per rules; timezone-safe; status transitions auditable; RTL and AR/EN localized strings; accessibility roles/lists correct.
 - Tasks
   - Action center with upcoming/overdue filings, renewals, and required evidence.
   - Calendar view per entity/country; ICS export and WhatsApp/SMS/email reminders (opt-in).
@@ -368,7 +396,7 @@ Mobile and Desktop dashboards deliver identical functions with layout-specific a
 - Q1: Phases 0–2
 - Q2: Phases 3–6
 - Q3: Phases 7–9
-- Q4: Phases 10��15 and global hardening
+- Q4: Phases 10–15 and global hardening
 
 ---
 
