@@ -224,11 +224,16 @@ export default function AdminSidebar({
           gap: 0.5rem;
           transition: all 300ms ease-in-out;
           flex-shrink: 0;
+          width: 100%;
         }
 
         .admin-sidebar-wrapper[data-collapsed="true"] .admin-sidebar-header {
           padding-bottom: 0.5rem;
           border-bottom: none;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 0.5rem;
         }
 
         .admin-sidebar-title {
@@ -239,12 +244,14 @@ export default function AdminSidebar({
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          transition: opacity 300ms ease-in-out;
+          transition: all 300ms ease-in-out;
+          min-width: 0;
         }
 
         .admin-sidebar-wrapper[data-collapsed="true"] .admin-sidebar-title {
           opacity: 0;
-          width: 0;
+          max-width: 0;
+          min-width: 0;
           visibility: hidden;
         }
 
