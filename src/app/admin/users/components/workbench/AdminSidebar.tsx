@@ -258,13 +258,26 @@ export default function AdminSidebar({
         .admin-sidebar-header-actions {
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 0.25rem;
           flex-shrink: 0;
+          transition: all 300ms ease-in-out;
+        }
+
+        .admin-sidebar-wrapper[data-collapsed="true"] .admin-sidebar-header-actions {
+          width: 100%;
+          flex-direction: column;
+          gap: 0.5rem;
         }
 
         .admin-sidebar-toggle-btn {
           transition: transform 300ms ease-in-out;
           flex-shrink: 0;
+        }
+
+        .admin-sidebar-wrapper[data-collapsed="true"] .admin-sidebar-toggle-btn {
+          width: 100%;
+          justify-content: center;
         }
 
         .admin-sidebar-content {
