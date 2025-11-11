@@ -44,6 +44,12 @@ model User {
   maxConcurrentProjects     Int?                    @default(3)
   hireDate                  DateTime?
   managerId                 String?
+  tier                      String?                 // Client tier: INDIVIDUAL, SMB, ENTERPRISE
+  workingHours              Json?                   // Team working hours schedule
+  bookingBuffer             Int?                    // Minutes buffer between bookings
+  autoAssign                Boolean?                // Auto-assign tasks
+  certifications            String[]                // Team certifications
+  experienceYears           Int?                    // Years of experience
   attachments               Attachment[]
   bookingPreferences        BookingPreferences?
   assignedByServiceRequests ServiceRequest[]        @relation("ServiceRequestAssignedBy")
@@ -74,6 +80,10 @@ model User {
   grantedPermissions        UserPermission[]        @relation("GrantedBy")
   userPermissions           UserPermission[]        @relation("UserPermissions")
   userProfile               UserProfile?
+  filterPresets             FilterPreset[]
+  presetSharesOwned         PresetShare[]           @relation("PresetShareOwner")
+  presetSharesReceived      PresetShare[]           @relation("PresetShareRecipient")
+  presetShareLogs           PresetShareLog[]
   manager                   User?                   @relation("ManagerEmployee", fields: [managerId], references: [id])
   employees                 User[]                  @relation("ManagerEmployee")
   tenant                    Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -87,10 +97,24 @@ model User {
   bulkOperationsApproved    BulkOperation[]         @relation("BulkOperationApprovedBy")
   bulkOperationResults      BulkOperationResult[]
   bulkOperationHistoryChanges BulkOperationHistory[] @relation("BulkOperationHistoryChangedBy")
+  reports                   Report[]
+  exportSchedules           ExportSchedule[]
 
   @@unique([tenantId, email])
   @@index([tenantId, role])
   @@index([tenantId, createdAt])
+  @@index([tenantId, availabilityStatus])
+  @@index([tenantId, department])
+  @@index([tenantId, tier])
+  @@index([tenantId, experienceYears])
+  @@index([tenantId, availabilityStatus, createdAt])
+  @@index([tenantId, role, createdAt])
+  // Phase 4.3: Server-side filtering optimization indexes
+  @@index([tenantId, email], name: "idx_users_tenantid_email")
+  @@index([tenantId, name], name: "idx_users_tenantid_name")
+  @@index([tenantId, role, availabilityStatus], name: "idx_users_tenantid_role_status")
+  @@index([tenantId, tier, createdAt(sort: Desc)], name: "idx_users_tenantid_tier_created")
+  @@index([tenantId, department, createdAt(sort: Desc)], name: "idx_users_tenantid_department_created")
   @@map("users")
 }
 
@@ -122,6 +146,74 @@ model UserProfile {
 
   @@index([userId])
   @@map("user_profiles")
+}
+
+model FilterPreset {
+  id            String   @id @default(cuid())
+  tenantId      String
+  userId        String
+  name          String   @db.VarChar(255)
+  description   String?
+  filters       Json     // Serialized FilterState object
+  isPinned      Boolean  @default(false)
+  usageCount    Int      @default(0)
+  lastUsedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  shares        PresetShare[]
+  exportSchedules ExportSchedule[]
+
+  @@unique([userId, tenantId, name])
+  @@index([tenantId, userId])
+  @@index([userId, isPinned])
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("filter_presets")
+}
+
+model PresetShare {
+  id              String   @id @default(cuid())
+  presetId        String
+  ownerId         String
+  sharedWithUserId String?  // null for team share
+  teamId          String?   // for team-level sharing
+  permissionLevel String   @default("viewer") // viewer, editor, admin
+  expiresAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  preset          FilterPreset @relation(fields: [presetId], references: [id], onDelete: Cascade)
+  owner           User         @relation("PresetShareOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  sharedWithUser  User?        @relation("PresetShareRecipient", fields: [sharedWithUserId], references: [id], onDelete: Cascade)
+
+  @@unique([presetId, sharedWithUserId])
+  @@index([presetId])
+  @@index([ownerId])
+  @@index([sharedWithUserId])
+  @@index([createdAt(sort: Desc)])
+  @@map("preset_shares")
+}
+
+model PresetShareLog {
+  id              String   @id @default(cuid())
+  presetId        String
+  userId          String
+  eventType       String   // CREATED, UPDATED, DELETED, SHARED, REVOKED, ACCESSED
+  eventDetails    Json?
+  ipAddress       String?
+  createdAt       DateTime @default(now())
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([presetId, createdAt(sort: Desc)])
+  @@index([userId, eventType, createdAt(sort: Desc)])
+  @@index([eventType, createdAt(sort: Desc)])
+  @@map("preset_share_logs")
 }
 
 model Account {
@@ -227,6 +319,10 @@ model Tenant {
   userWorkflows         UserWorkflow[]
   workflowTemplates     WorkflowTemplate[]
   bulkOperations        BulkOperation[]
+  filterPresets         FilterPreset[]
+  reports               Report[]
+  userManagementSettings UserManagementSettings?
+  exportSchedules    ExportSchedule[]
 
   @@index([status])
 }
@@ -1159,6 +1255,28 @@ model OrganizationSettings {
   @@map("organization_settings")
 }
 
+model UserManagementSettings {
+  id                String   @id @default(cuid())
+  tenantId          String   @unique
+  roles             Json     @default("{}")
+  permissions       Json     @default("[]")
+  onboarding        Json     @default("{}")
+  policies          Json     @default("{}")
+  rateLimits        Json     @default("{}")
+  sessions          Json     @default("{}")
+  invitations       Json     @default("{}")
+  clientSettings    Json?
+  teamSettings      Json?
+  lastUpdatedAt     DateTime @updatedAt
+  lastUpdatedBy     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("user_management_settings")
+}
+
 model TranslationKey {
   id           String   @id @default(cuid())
   tenantId     String
@@ -1804,4 +1922,146 @@ model BulkOperationHistory {
 
   @@index([bulkOperationId, createdAt])
   @@map("bulk_operation_history")
+}
+
+// Phase 3 Workflow Designer Models
+model Workflow {
+  id              String                @id @default(cuid())
+  name            String                @db.VarChar(255)
+  description     String?
+  version         Int                   @default(1)
+  status          String                @default("DRAFT") // DRAFT, ACTIVE, ARCHIVED
+  nodes           Json                  @default("[]") // WorkflowNode[]
+  edges           Json                  @default("[]") // WorkflowEdge[]
+  createdBy       String                @default("system")
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  // Relations
+  simulations     WorkflowSimulation[]
+
+  @@index([status, createdAt])
+  @@index([createdBy, createdAt])
+  @@map("workflows")
+}
+
+model WorkflowSimulation {
+  id              String                @id @default(cuid())
+  workflowId      String
+  testData        Json?
+  executionPath   Json                  @default("[]") // ExecutionStep[]
+  totalDuration   Int                   @default(0)
+  success         Boolean               @default(false)
+  errors          String[]              @default([])
+  createdAt       DateTime              @default(now())
+
+  // Relations
+  workflow        Workflow              @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId, createdAt])
+  @@map("workflow_simulations")
+}
+
+// Phase 14: Report Builder Models
+model Report {
+  id                String                        @id @default(cuid())
+  tenantId          String
+  userId            String
+  name              String                        @db.VarChar(255)
+  description       String?
+  format            String                        @default("table") // table, grid, pivot, chart
+  sections          Json                          @default("[]") // ReportSection[]
+  pageSize          String                        @default("A4") // A4, Letter, Tabloid
+  orientation       String                        @default("portrait") // portrait, landscape
+  includeHeader     Boolean                       @default(true)
+  includeFooter     Boolean                       @default(true)
+  headerText        String?
+  footerText        String?
+  templateId        String?
+  lastGeneratedAt   DateTime?
+  generationCount   Int                           @default(0)
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+
+  // Relations
+  tenant            Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  creator           User                          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  executions        ReportExecution[]
+
+  @@index([tenantId, createdAt])
+  @@index([userId, createdAt])
+  @@map("reports")
+}
+
+model ReportExecution {
+  id                String                        @id @default(cuid())
+  reportId          String
+  status            String                        // pending, generating, completed, failed
+  filePath          String?
+  fileSizeBytes     Int?
+  generationTimeMs  Int?
+  errorMessage      String?
+  executedAt        DateTime                      @default(now())
+  completedAt       DateTime?
+  createdAt         DateTime                      @default(now())
+
+  // Relations
+  report            Report                        @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId, status])
+  @@index([executedAt])
+  @@map("report_executions")
+}
+
+// Phase 13: Export Scheduler Models
+model ExportSchedule {
+  id                String                        @id @default(cuid())
+  tenantId          String
+  userId            String
+  name              String                        @db.VarChar(255)
+  description       String?
+  frequency         String                        // daily, weekly, biweekly, monthly, quarterly, yearly
+  format            String                        // csv, xlsx, json, pdf
+  recipients        String[]                      // Email addresses
+  dayOfWeek         String?                       // monday, tuesday, ... (for weekly)
+  dayOfMonth        Int?                          // 1-31 (for monthly/quarterly/yearly)
+  time              String?                       @default("09:00") // HH:mm format
+  emailSubject      String?
+  emailBody         String?
+  filterPresetId    String?                       // Optional: specific filter preset to export
+  isActive          Boolean                       @default(true)
+  lastExecutedAt    DateTime?
+  nextExecutedAt    DateTime?
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+
+  // Relations
+  tenant            Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user              User                          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filterPreset      FilterPreset?                 @relation(fields: [filterPresetId], references: [id], onDelete: SetNull)
+  executions        ExportScheduleExecution[]
+
+  @@index([tenantId, isActive])
+  @@index([userId, createdAt])
+  @@index([nextExecutedAt, isActive])
+  @@map("export_schedules")
+}
+
+model ExportScheduleExecution {
+  id                String                        @id @default(cuid())
+  scheduleId        String
+  status            String                        // pending, processing, completed, failed
+  executedAt        DateTime                      @default(now())
+  recordCount       Int                           @default(0)
+  fileSizeBytes     Int?
+  errorMessage      String?
+  deliveryStatus    Json?                         // Record<string, 'sent' | 'bounced' | 'failed'>
+  createdAt         DateTime                      @default(now())
+
+  // Relations
+  schedule          ExportSchedule                @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleId, status])
+  @@index([executedAt])
+  @@map("export_schedule_executions")
 }
