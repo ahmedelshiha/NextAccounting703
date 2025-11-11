@@ -87,19 +87,34 @@ export default function AdminSidebar({
   }, [])
 
   return (
-    <div className="admin-sidebar-wrapper">
-      {/* Header with close button (mobile) */}
+    <div className="admin-sidebar-wrapper" data-collapsed={isCollapsed}>
+      {/* Header with collapse/close buttons */}
       <div className="admin-sidebar-header">
-        <h3 className="text-lg font-semibold text-gray-900">Analytics</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          className="lg:hidden"
-          aria-label="Close sidebar"
-        >
-          <X className="w-5 h-5" />
-        </Button>
+        <h3 className={`text-lg font-semibold text-gray-900 admin-sidebar-title ${isCollapsed ? 'hidden' : ''}`}>
+          Analytics
+        </h3>
+        <div className="admin-sidebar-header-actions">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleSidebarCollapse}
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-expanded={!isCollapsed}
+            title={isCollapsed ? 'Expand' : 'Collapse'}
+            className="admin-sidebar-toggle-btn"
+          >
+            {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="lg:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
       {/* Sidebar content */}
