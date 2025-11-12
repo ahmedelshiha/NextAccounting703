@@ -81,7 +81,7 @@ const _api_POST = async (request: NextRequest) => {
           licenseNumber: input.licenseNumber,
           economicZoneId: input.economicZoneId,
         }] : undefined,
-        registrations: input.registrations || [],
+        registrations: (input.registrations as any) || [],
       }
     );
 
