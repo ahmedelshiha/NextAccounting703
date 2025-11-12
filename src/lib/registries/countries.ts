@@ -81,22 +81,13 @@ export interface CountryConfig {
 }
 
 /**
- * Calculate TRN checksum (UAE: 15-digit Luhn algorithm)
+ * Validate TRN format (UAE: 15-digit)
+ * Note: Full checksum validation requires FTA registry access
+ * This basic validation checks format only
  */
 function validateTRNChecksum(trn: string): boolean {
   if (trn.length !== 15) return false
-  const digits = trn.split('').map(Number)
-  let sum = 0
-  for (let i = 0; i < 14; i++) {
-    let digit = digits[i]
-    if (i % 2 === 0) {
-      digit *= 2
-      if (digit > 9) digit -= 9
-    }
-    sum += digit
-  }
-  const checkDigit = (10 - (sum % 10)) % 10
-  return checkDigit === digits[14]
+  return /^\d{15}$/.test(trn)
 }
 
 /**
