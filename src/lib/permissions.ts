@@ -109,6 +109,12 @@ export const PERMISSIONS = {
 
   // Advanced exports
   USERS_EXPORT: 'users.export',
+
+  // Entity Management (Portal)
+  ENTITIES_CREATE: 'entities.create',
+  ENTITIES_READ: 'entities.read',
+  ENTITIES_UPDATE: 'entities.update',
+  ENTITIES_DELETE: 'entities.delete',
 } as const
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
