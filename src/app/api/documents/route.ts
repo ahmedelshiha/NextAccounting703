@@ -19,7 +19,7 @@ const DocumentFilterSchema = z.object({
 
 type DocumentFilter = z.infer<typeof DocumentFilterSchema>
 
-async function GET(request: NextRequest) {
+export const GET = withTenantContext(async (request: NextRequest) => {
   try {
     const { userId, tenantId } = requireTenantContext()
 
@@ -178,9 +178,9 @@ async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})
 
-export default withTenantContext(GET, { requireAuth: true })
+
 
 /**
  * Extract category from storage key path

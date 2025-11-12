@@ -9,8 +9,7 @@ import { z } from 'zod'
  * GET /api/intake/questions
  * Retrieves intake questionnaire for client onboarding
  */
-export async function GET(request: NextRequest) {
-  return withTenantContext(async () => {
+export const GET = withTenantContext(async (request: NextRequest) => {
     const { userId, tenantId } = requireTenantContext()
 
     if (!userId || !tenantId) {
@@ -35,7 +34,6 @@ export async function GET(request: NextRequest) {
       },
     })
   })
-}
 
 /**
  * POST /api/intake/responses
@@ -48,8 +46,7 @@ const SaveResponsesSchema = z.object({
   entityName: z.string().optional(),
 })
 
-export async function POST(request: NextRequest) {
-  return withTenantContext(async () => {
+export const POST = withTenantContext(async (request: NextRequest) => {
     const { userId, tenantId } = requireTenantContext()
 
     if (!userId || !tenantId) {
@@ -124,6 +121,6 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to save intake responses' },
         { status: 500 }
       )
-    }
-  })
-}
+     )
+  }
+})
