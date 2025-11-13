@@ -1,10 +1,11 @@
 import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
-import { countryRegistry } from "@/lib/registries/countries";
+import { getCountry } from "@/lib/registries/countries";
 import { logAuditSafe } from "@/lib/observability-helpers";
 
 
 import type { EntityRow } from "@/lib/csv/entity-importer";
+import { Redis } from "@upstash/redis";
 
 export type CsvImportJobStatus = 
   | "PENDING"
@@ -168,7 +169,7 @@ async function processEntityRow(
 ): Promise<{ success: boolean; error?: string; entityId?: string }> {
   try {
     // Validate country
-    const country = countryRegistry.getCountry(row.country);
+    const country = getCountry(row.country);
     if (!country) {
       return { success: false, error: "Invalid country code" };
     }
